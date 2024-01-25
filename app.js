@@ -40,6 +40,31 @@ class Bd {
 
 		localStorage.setItem('id', id)
 	}
+
+    recuperarTodosRegistros() {
+
+        //array despesas
+        let despesas = Array()
+
+        let id = localStorage.getItem('id')
+
+        //recuperar despesas cadastradas
+        for(let i = 1; i <= id; i++) {
+
+            //recuperar a despesa
+            let despesa = JSON.parse(localStorage.getItem(i))
+
+            //possibilidade índices pulados ou removidos
+            //nesses casos pular índices
+            if(despesa === null) {
+                continue
+            }
+
+            despesas.push(despesa)
+        }
+
+        return despesas
+    }
 }
 
 let bd = new Bd()
@@ -65,7 +90,7 @@ function cadastrarDespesa() {
 
 
 	if(despesa.validarDados()) {
-		//bd.gravar(despesa)
+		bd.gravar(despesa)
 
 		document.getElementById('modal_titulo').innerHTML = 'Registro inserido com sucesso'
 		document.getElementById('modal_titulo_div').className = 'modal-header text-success'
@@ -87,3 +112,44 @@ function cadastrarDespesa() {
 		$('#modalRegistraDespesa').modal('show') 
 	}
 }
+
+
+function carregaListaDespesas() {
+
+    let despesas = Array()
+
+    despesas = bd.recuperarTodosRegistros()
+
+    //selecionando o elemento tbody
+    let listaDespesas = document.getElementById('listaDespesas')
+
+    //percorrer o array despesas, listando de forma dinâmica
+    despesas.forEach(function(d) {
+        
+        //criando a linha(tr)
+        let linha = listaDespesas.insertRow()
+
+        //criar colunas(td)
+        linha.insertCell(0).innerHTML = `${d.dia}/${d.mes}/${d.ano}` 
+
+        //ajustar o tipo 
+        switch(d.tipo) {
+            case '1': d.tipo = 'Alimentação'
+                break
+            case '2': d.tipo = 'Educação'
+                break
+            case '3': d.tipo = 'Lazer'
+                break
+            case '4': d.tipo = 'Saúde'
+                break
+            case '5': d.tipo = 'Tranporte'
+                break
+        }
+
+        linha.insertCell(1).innerHTML = d.tipo
+
+        linha.insertCell(2).innerHTML = d.descricao
+        linha.insertCell(3).innerHTML = d.valor
+    })
+}
+    
